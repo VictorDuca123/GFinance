@@ -1,9 +1,20 @@
-import { Stack } from "expo-router";
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { colors } from '../src/constants/theme';
 
 export default function RootLayout() {
   return (
-    <Stack screenOptions={{ headerTitleAlign: "center" }}>
-      <Stack.Screen name="index" options={{ title: "GFinance" }} />
-    </Stack>
+    <>
+      <StatusBar style="light" />
+      <Stack
+        screenOptions={{
+          headerStyle: { backgroundColor: colors.primary },
+          headerTintColor: colors.onPrimary,
+          headerTitleStyle: { fontSize: 22, fontWeight: '700' },
+          headerBackTitle: 'Voltar',
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+    </>
   );
 }

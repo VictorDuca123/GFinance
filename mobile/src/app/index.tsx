@@ -1,82 +1,44 @@
-import { StyleSheet, Text, View } from "react-native";
-import { colors, spacing, typography } from "@/constants/theme";
+import { Stack, useRouter } from 'expo-router';
+import { StyleSheet, Text, View } from 'react-native';
+import { Card } from '../src/components/Card';
+import { Screen } from '../src/components/Screen';
+import { Muted, Subtitle, Title } from '../src/components/Typography';
+import { APP_NAME } from '../src/constants/config';
+import { spacing } from '../src/constants/theme';
 
-export default function Inicio() {
+const MODULOS = [
+  { titulo: 'Clientes', descricao: 'Cadastro e valores pendentes', icone: '👥', rota: '/clientes' },
+  { titulo: 'Fornecedores', descricao: 'Cadastro e consulta', icone: '🏭', rota: '/fornecedores' },
+  { titulo: 'Recebimentos', descricao: 'Valores recebidos dos clientes', icone: '💰', rota: '/recebimentos' },
+  { titulo: 'Saídas', descricao: 'Despesas efetuadas', icone: '🧾', rota: '/saidas' },
+  { titulo: 'Relatórios', descricao: 'Totais e resultado por período', icone: '📊', rota: '/relatorios' },
+  { titulo: 'Histórico', descricao: 'Quem alterou o quê e quando', icone: '🕘', rota: '/historico' },
+] as const;
+
+export default function HomeScreen() {
+  const router = useRouter();
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>GFinance</Text>
-      <Text style={styles.subtitle}>Gestão financeira</Text>
-    </View>
+    <Screen>
+      <Stack.Screen options={{ title: APP_NAME }} />
+      <Title>O que você quer fazer?</Title>
+      <Muted>Escolha um módulo para começar.</Muted>
+      <View style={styles.grade}>
+        {MODULOS.map((m) => (
+          <View key={m.rota} style={styles.celula}>
+            <Card onPress={() => router.push(m.rota)}>
+              <Text style={styles.icone}>{m.icone}</Text>
+              <Subtitle>{m.titulo}</Subtitle>
+              <Muted>{m.descricao}</Muted>
+            </Card>
+          </View>
+        ))}
+      </View>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.background,
-    padding: spacing.lg,
-  },
-  title: {
-    fontSize: typography.title,
-    fontWeight: "700",
-    color: colors.text,
-  },
-  subtitle: {
-    fontSize: typography.subtitle,
-    color: colors.textMuted,
-    marginTop: spacing.sm,
-  },
+  grade: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
+  celula: { flexBasis: '47%', flexGrow: 1, minWidth: 260 },
+  icone: { fontSize: 36 },
 });
-
-export type ID = number;
-
-export interface Cliente {
-  id: ID;
-  nome: string;
-  outrasInformacoes?: string;
-  totalAReceber: number;
-  totalRecebido: number;
-  valorPendente: number;
-}
-export interface Fornecedor { id: ID; nome: string; outrasInformacoes?: string }
-export interface Recebimento {
-  id: ID;
-  clienteId: ID;
-  clienteNome: string;
-  valor: number;
-  data: string; // ISO: aaaa-mm-dd
-  informacoesAdicionais?: string;
-}
-export interface Saida { id: ID; descricao: string; valor: number; data: string }
-
-export type AcaoHistorico = 'INCLUSAO' | 'EDICAO';
-export type TipoRegistro = 'CLIENTE' | 'FORNECEDOR' | 'RECEBIMENTO' | 'SAIDA';
-export interface Atividade {
-  id: ID;
-  nomeResponsavel: string;
-  acao: AcaoHistorico;
-  tipoRegistro: TipoRegistro;
-  idRegistro: ID;
-  dataHora: string;
-}
-export interface RelatorioPeriodo {
-  dataInicio: string;
-  dataFim: string;
-  totalRecebimentos: number;
-  totalSaidas: number;
-  resultado: number;
-}
-
-export interface Periodo { dataInicio: string | null; dataFim: string | null }
-export interface FiltroRecebimento extends Partial<Periodo> { clienteId?: ID }
-
-export interface PessoaDados { nome: string; outrasInformacoes: string }
-export interface RecebimentoForm {
-  clienteId: ID;
-  valor: number;
-  data: string;
-  informacoesAdicionais: string;
-}
-export interface SaidaForm { descricao: string; valor: number; data: string }
