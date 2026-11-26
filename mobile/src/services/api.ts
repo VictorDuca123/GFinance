@@ -1,14 +1,19 @@
 import {
   Atividade, Cliente, FiltroRecebimento, Fornecedor, ID, PessoaDados,
-  Recebimento, RecebimentoForm, RelatorioPeriodo, Saida, SaidaForm, TipoRegistro,
+  Recebimento, RecebimentoForm, RelatorioPeriodo, Responsavel, Saida, SaidaForm, TipoRegistro,
 } from '../types';
 
 /* CAMADA DE DADOS FICTÍCIOS */
-export const MOCK_FORCAR_ERRO = false; // true = simula falha de conexão (só para testar)
+export const MOCK_FORCAR_ERRO = false; // true = simula falha nas operações de dados (só para testar)
+export const MOCK_FORCAR_ERRO_RESPONSAVEIS = false; // true = simula falha ao carregar os responsáveis (só para testar)
 const LATENCIA_MS = 400;
 
-async function simularRede(): Promise<void> {
+async function simularLatencia(): Promise<void> {
   await new Promise<void>((r) => setTimeout(r, LATENCIA_MS));
+}
+
+async function simularRede(): Promise<void> {
+  await simularLatencia();
   if (MOCK_FORCAR_ERRO) throw new Error('Falha de conexão simulada.');
 }
 
@@ -44,6 +49,11 @@ const atividades: Atividade[] = [
   { id: 3, nomeResponsavel: 'Responsável (teste)', acao: 'EDICAO', tipoRegistro: 'CLIENTE', idRegistro: 1, dataHora: '2026-11-11T10:15:00-03:00' },
 ];
 const proximo = { cliente: 4, fornecedor: 3, recebimento: 4, saida: 3, atividade: 4 };
+const responsaveis: Responsavel[] = [
+  { id: 1, nome: 'Responsável 1' },
+  { id: 2, nome: 'Responsável 2' },
+  { id: 3, nome: 'Responsável 3' },
+];
 
 function paraCliente(r: ClienteRegistro): Cliente {
   const totalRecebido = arred(recebimentos.filter((x) => x.clienteId === r.id).reduce((s, x) => s + x.valor, 0));
@@ -181,5 +191,13 @@ export const historicoApi = {
   async listar(): Promise<Atividade[]> {
     await simularRede();
     return [...atividades].sort((a, b) => b.dataHora.localeCompare(a.dataHora));
+  },
+};
+export const responsaveisApi = {
+  // Devolve cópias para nenhuma tela conseguir alterar a lista original.
+  async listar(): Promise<Responsavel[]> {
+    await simularLatencia();
+    if (MOCK_FORCAR_ERRO_RESPONSAVEIS) throw new Error('Falha de conexão simulada.');
+    return responsaveis.map((r) => ({ ...r }));
   },
 };
