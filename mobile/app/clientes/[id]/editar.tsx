@@ -6,15 +6,19 @@ import { StateView } from '../../../src/components/StateView';
 import { useScreenData } from '../../../src/hooks/useScreenData';
 import { clientesApi } from '../../../src/services/api';
 import { PessoaDados } from '../../../src/types';
+import { useResponsavelDaOperacao } from '../../../src/hooks/useResponsavelDaOperacao';
 
 export default function EditarClienteScreen() {
   const router = useRouter();
+  const { consumir } = useResponsavelDaOperacao('Editar cliente');   // após "const clienteId = Number(id);"
   const { id } = useLocalSearchParams<{ id: string }>();
   const clienteId = Number(id);
   const { data, loading, error, reload } = useScreenData(() => clientesApi.obter(clienteId), [clienteId]);
 
   async function salvar(dados: PessoaDados) {
-    await clientesApi.atualizar(clienteId, dados);
+    const responsavelId = await consumir();
+    if (responsavelId === null) throw new Error('Identificação cancelada. Nada foi salvo.');
+    await clientesApi.atualizar(clienteId, dados, responsavelId);
     Alert.alert('Cliente atualizado', 'As alterações foram salvas.', [{ text: 'OK', onPress: () => router.back() }]);
   }
 

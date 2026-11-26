@@ -9,11 +9,13 @@ import { TextField } from '../../src/components/TextField';
 import { clientesApi, recebimentosApi } from '../../src/services/api';
 import { Cliente } from '../../src/types';
 import { dateBRToISO, formatDate, maskDate, parseMoney, todayISO } from '../../src/utils/format';
+import { useResponsavelDaOperacao } from '../../src/hooks/useResponsavelDaOperacao';
 
 interface Erros { cliente?: string; valor?: string; data?: string }
 
 export default function NovoRecebimentoScreen() {
   const router = useRouter();
+  const { consumir } = useResponsavelDaOperacao('Registrar recebimento');
   const { clienteId } = useLocalSearchParams<{ clienteId?: string }>();
   const [cliente, setCliente] = useState<Cliente | null>(null);
   const [valorTxt, setValorTxt] = useState('');
@@ -43,7 +45,9 @@ export default function NovoRecebimentoScreen() {
     setErroEnvio(null);
     setEnviando(true);
     try {
-      await recebimentosApi.criar({ clienteId: cliente.id, valor, data, informacoesAdicionais: info.trim() });
+      const responsavelId = await consumir();
+      if (responsavelId === null) throw new Error('Identificação cancelada. Nada foi salvo.');
+      await recebimentosApi.criar({ clienteId: cliente.id, valor, data, informacoesAdicionais: info.trim() }, responsavelId);
       Alert.alert('Recebimento registrado', 'O recebimento foi salvo com sucesso.', [{ text: 'OK', onPress: () => router.back() }]);
     } catch (e) {
       setErroEnvio(e instanceof Error ? e.message : 'Não foi possível salvar. Tente novamente.');

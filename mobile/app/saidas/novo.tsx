@@ -7,11 +7,13 @@ import { Screen } from '../../src/components/Screen';
 import { TextField } from '../../src/components/TextField';
 import { saidasApi } from '../../src/services/api';
 import { dateBRToISO, formatDate, maskDate, parseMoney, todayISO } from '../../src/utils/format';
+import { useResponsavelDaOperacao } from '../../src/hooks/useResponsavelDaOperacao';
 
 interface Erros { descricao?: string; valor?: string; data?: string }
 
 export default function NovaSaidaScreen() {
   const router = useRouter();
+  const { consumir } = useResponsavelDaOperacao('Registrar saída');
   const [descricao, setDescricao] = useState('');
   const [valorTxt, setValorTxt] = useState('');
   const [dataTxt, setDataTxt] = useState(formatDate(todayISO()));
@@ -33,7 +35,9 @@ export default function NovaSaidaScreen() {
     setErroEnvio(null);
     setEnviando(true);
     try {
-      await saidasApi.criar({ descricao: desc, valor, data });
+      const responsavelId = await consumir();
+      if (responsavelId === null) throw new Error('Identificação cancelada. Nada foi salvo.');
+      await saidasApi.criar({ descricao: desc, valor, data }, responsavelId);
       Alert.alert('Saída registrada', 'A despesa foi salva com sucesso.', [{ text: 'OK', onPress: () => router.back() }]);
     } catch (e) {
       setErroEnvio(e instanceof Error ? e.message : 'Não foi possível salvar. Tente novamente.');
