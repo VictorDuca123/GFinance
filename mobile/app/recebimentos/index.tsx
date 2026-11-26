@@ -1,4 +1,4 @@
-import { Stack, useRouter } from 'expo-router';
+import { Stack } from 'expo-router';
 import { useState } from 'react';
 import { FlatList } from 'react-native';
 import { AppButton } from '../../src/components/AppButton';
@@ -12,17 +12,17 @@ import { useScreenData } from '../../src/hooks/useScreenData';
 import { recebimentosApi } from '../../src/services/api';
 import { Periodo } from '../../src/types';
 import { formatCurrency, formatDate } from '../../src/utils/format';
+import { useIniciarOperacao } from '../../src/hooks/useIniciarOperacao';
 
 export default function RecebimentosScreen() {
-  const router = useRouter();
+  const iniciar = useIniciarOperacao();
   const [periodo, setPeriodo] = useState<Periodo>({ dataInicio: null, dataFim: null });
   const { data, loading, error, reload } = useScreenData(() => recebimentosApi.listar({ ...periodo }), [periodo]);
 
   return (
     <Screen scroll={false}>
       <Stack.Screen options={{ title: 'Recebimentos' }} />
-      {/* B4: identificação rápida entra aqui */}
-      <AppButton label="Registrar recebimento" onPress={() => router.push('./novo')} />
+      <AppButton label="Registrar recebimento" onPress={() => iniciar('Registrar recebimento', { pathname: '/recebimentos/novo' })} />
       <PeriodFilter onApply={setPeriodo} />
       <StateView loading={loading && !data} error={error} empty={!!data && data.length === 0} emptyMessage="Nenhum recebimento no período." onRetry={reload}>
         <FlatList

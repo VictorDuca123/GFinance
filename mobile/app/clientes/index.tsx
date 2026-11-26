@@ -12,9 +12,11 @@ import { useDebounce } from '../../src/hooks/useDebounce';
 import { useScreenData } from '../../src/hooks/useScreenData';
 import { clientesApi } from '../../src/services/api';
 import { formatCurrency } from '../../src/utils/format';
+import { useIniciarOperacao } from '../../src/hooks/useIniciarOperacao';
 
 export default function ClientesScreen() {
   const router = useRouter();
+  const iniciar = useIniciarOperacao();
   const [busca, setBusca] = useState('');
   const [somentePendentes, setSomentePendentes] = useState(false);
   const termo = useDebounce(busca);
@@ -28,8 +30,7 @@ export default function ClientesScreen() {
     <Screen scroll={false}>
       <Stack.Screen options={{ title: 'Clientes' }} />
       <View style={styles.topo}>
-        {/* B4: aqui entrará a janela "Quem vai fazer essa alteração?" antes do formulário */}
-        <AppButton label="Adicionar cliente" onPress={() => router.push('/clientes/novo')} />
+        <AppButton label="Adicionar cliente" onPress={() => iniciar('Adicionar cliente', { pathname: '/clientes/novo' })} />
         <TextField label="Buscar por nome" value={busca} onChangeText={setBusca} placeholder="Digite parte do nome" />
         <View style={styles.filtro}>
           <Body>Mostrar somente clientes com pendência</Body>

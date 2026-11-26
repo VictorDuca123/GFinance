@@ -48,3 +48,4 @@ export interface RecebimentoForm {
   informacoesAdicionais: string;
 }
 export interface SaidaForm { descricao: string; valor: number; data: string }
+export interface Responsavel { id: ID; nome: string }

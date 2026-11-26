@@ -1,4 +1,4 @@
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { AppButton } from '../../../src/components/AppButton';
 import { Card } from '../../../src/components/Card';
@@ -9,9 +9,10 @@ import { spacing } from '../../../src/constants/theme';
 import { useScreenData } from '../../../src/hooks/useScreenData';
 import { clientesApi, recebimentosApi } from '../../../src/services/api';
 import { formatCurrency, formatDate } from '../../../src/utils/format';
+import { useIniciarOperacao } from '../../../src/hooks/useIniciarOperacao';
 
 export default function ClienteDetalheScreen() {
-  const router = useRouter();
+  const iniciar = useIniciarOperacao();
   const { id } = useLocalSearchParams<{ id: string }>();
   const clienteId = Number(id);
 
@@ -38,9 +39,8 @@ export default function ClienteDetalheScreen() {
               <View style={styles.linha}><Muted>Valor pendente</Muted><Strong>{formatCurrency(data.cliente.valorPendente)}</Strong></View>
             </Card>
 
-            <AppButton label="Editar cliente" variant="secondary" onPress={() => router.push({ pathname: '/clientes/[id]/editar', params: { id: String(clienteId) } })} />
-            <AppButton label="Registrar recebimento" onPress={() => router.push({ pathname: '/recebimentos/novo', params: { clienteId: String(clienteId) } })} />
-
+            <AppButton label="Editar cliente" variant="secondary" onPress={() => iniciar('Editar cliente', { pathname: '/clientes/[id]/editar', params: { id: String(clienteId) } })} />
+            <AppButton label="Registrar recebimento" onPress={() => iniciar('Registrar recebimento', { pathname: '/recebimentos/novo', params: { clienteId: String(clienteId) } })} />
             <Subtitle>Recebimentos</Subtitle>
             {data.recebimentos.length === 0 ? (
               <Muted>Nenhum recebimento registrado para este cliente.</Muted>
