@@ -6,6 +6,7 @@ import {
 /* CAMADA DE DADOS FICTÍCIA */
 export const MOCK_FORCAR_ERRO = false; 
 export const MOCK_FORCAR_ERRO_RESPONSAVEIS = false;
+const LATENCIA_MS = 400;
 
 async function simularLatencia(): Promise<void> {
   await new Promise<void>((r) => setTimeout(r, LATENCIA_MS));
