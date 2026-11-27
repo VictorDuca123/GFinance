@@ -10,7 +10,7 @@ import { Button } from '../../src/components/Button';
 import { HeroHeader } from '../../src/components/HeroHeader';
 import { IconChevronLeft, IconPlus, IconSearch } from '../../src/components/icons';
 import { Avatar } from '../../src/components/NumberCircle';
-import { StateView } from '../../src/components/StateView';
+import { EstadoErro, EstadoVazio, Esqueleto } from '../../src/components/EstadosLista';
 import { colors, fonts, radius, shadow, touch } from '../../src/constants/theme';
 import { useDebounce } from '../../src/hooks/useDebounce';
 import { useIniciarOperacao } from '../../src/hooks/useIniciarOperacao';
@@ -39,6 +39,9 @@ export default function ClientesScreen() {
     [termo, somentePendentes],
   );
 
+  // Sem busca e sem filtro, lista vazia quer dizer que ainda não há nenhum cliente cadastrado.
+  const semFiltro = !termo.trim() && !somentePendentes;
+  const novoCliente = () => iniciar('Adicionar cliente', { pathname: '/clientes/novo' });
   const abrir = (c: Cliente) => router.push({ pathname: '/clientes/[id]', params: { id: String(c.id) } });
 
   return (
@@ -77,7 +80,7 @@ export default function ClientesScreen() {
           <Button
             label="Novo cliente"
             icon={(cor) => <IconPlus size={22} color={cor} strokeWidth={2.6} />}
-            onPress={() => iniciar('Adicionar cliente', { pathname: '/clientes/novo' })}
+            onPress={novoCliente}
           />
         </View>
 
@@ -99,13 +102,24 @@ export default function ClientesScreen() {
         </View>
 
         <View style={styles.lista}>
-          <StateView
-            loading={loading && !data}
-            error={error}
-            empty={!!data && data.itens.length === 0}
-            emptyMessage={somentePendentes ? 'Nenhum cliente com valor pendente.' : 'Nenhum cliente encontrado.'}
-            onRetry={reload}
-          >
+          {loading && !data ? (
+            <Esqueleto />
+          ) : error ? (
+            <EstadoErro mensagem={error} onRetry={reload} />
+          ) : data && data.itens.length === 0 ? (
+            semFiltro ? (
+              <EstadoVazio
+                titulo="Nenhum cliente ainda"
+                texto="Cadastre o primeiro cliente para começar a registrar entradas."
+                acao={{ rotulo: 'Cadastrar cliente', onPress: novoCliente }}
+              />
+            ) : (
+              <EstadoVazio
+                titulo={somentePendentes ? 'Nenhum cliente com valor pendente' : 'Nenhum cliente encontrado'}
+                texto={somentePendentes ? 'Todos os clientes estão em dia.' : 'Confira o nome digitado na busca.'}
+              />
+            )
+          ) : (
             <FlatList
               data={data?.itens ?? []}
               keyExtractor={(c) => String(c.id)}
@@ -113,7 +127,7 @@ export default function ClientesScreen() {
               keyboardShouldPersistTaps="handled"
               renderItem={({ item }) => <LinhaCliente cliente={item} empilhar={estreita} onPress={() => abrir(item)} />}
             />
-          </StateView>
+          )}
         </View>
       </View>
     </View>

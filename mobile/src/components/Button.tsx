@@ -18,6 +18,8 @@ interface Props {
   compact?: boolean;
   /** Para filtros e atalhos que ficam marcados. */
   selected?: boolean;
+  /** Dica falada pelo leitor de tela (ex.: por que o botão está desabilitado). */
+  hint?: string;
 }
 
 const TEXTO: Record<ButtonVariant, string> = {
@@ -28,7 +30,7 @@ const TEXTO: Record<ButtonVariant, string> = {
 
 /** Botão do novo visual: primary (verde sólido), outline (borda verde) e ghost (borda cinza). */
 export function Button({
-  label, onPress, variant = 'primary', disabled = false, loading = false, icon, elevated, compact, selected,
+  label, onPress, variant = 'primary', disabled = false, loading = false, icon, elevated, compact, selected, hint,
 }: Props) {
   const inativo = disabled || loading;
   const corTexto = inativo && variant === 'primary' ? colors.disabledText : TEXTO[variant];
@@ -37,6 +39,7 @@ export function Button({
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={label}
+      accessibilityHint={hint}
       accessibilityState={{ disabled: inativo, busy: loading, ...(selected !== undefined && { selected }) }}
       onPress={onPress}
       disabled={inativo}
