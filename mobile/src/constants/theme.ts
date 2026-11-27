@@ -40,6 +40,7 @@ export const colors = {
   onDark: '#FFFFFF',
   onDarkMuted: 'rgba(255,255,255,0.92)',
   glassLight: 'rgba(255,255,255,0.2)', // círculo de ícone sobre o degradê
+  glassButton: 'rgba(255,255,255,0.16)', // botão voltar sobre o degradê
   textScrim: 'rgba(0,0,0,0.45)', // sombra que mantém texto branco legível sobre o verde
   scrim: 'rgba(0,0,0,0.35)', // escurece a tela atrás de uma janela
 
