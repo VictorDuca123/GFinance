@@ -41,6 +41,7 @@ export const colors = {
   onDarkMuted: 'rgba(255,255,255,0.92)',
   glassLight: 'rgba(255,255,255,0.2)', // círculo de ícone sobre o degradê
   textScrim: 'rgba(0,0,0,0.45)', // sombra que mantém texto branco legível sobre o verde
+  scrim: 'rgba(0,0,0,0.35)', // escurece a tela atrás de uma janela
 
   // Nomes antigos, ainda usados pelas telas fora do novo visual (Fornecedores, Saídas,
   // Histórico, Relatórios). Apontam para a paleta nova para manter tudo coerente.
