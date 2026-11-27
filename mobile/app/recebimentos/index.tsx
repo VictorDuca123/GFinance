@@ -21,10 +21,10 @@ export default function RecebimentosScreen() {
 
   return (
     <Screen scroll={false}>
-      <Stack.Screen options={{ title: 'Recebimentos' }} />
-      <AppButton label="Registrar recebimento" onPress={() => iniciar('Registrar recebimento', { pathname: '/recebimentos/novo' })} />
+      <Stack.Screen options={{ title: 'Entradas' }} />
+      <AppButton label="Registrar entrada" onPress={() => iniciar('Registrar entrada', { pathname: '/recebimentos/novo' })} />
       <PeriodFilter onApply={setPeriodo} />
-      <StateView loading={loading && !data} error={error} empty={!!data && data.length === 0} emptyMessage="Nenhum recebimento no período." onRetry={reload}>
+      <StateView loading={loading && !data} error={error} empty={!!data && data.length === 0} emptyMessage="Nenhuma entrada no período." onRetry={reload}>
         <FlatList
           data={data ?? []}
           keyExtractor={(r) => String(r.id)}
