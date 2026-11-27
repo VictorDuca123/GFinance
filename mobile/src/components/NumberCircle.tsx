@@ -16,7 +16,8 @@ export function NumberCircle({ numero, size = 48 }: { numero: number; size?: num
 
 /** Avatar de iniciais do cliente: círculo de 52 dp com a primeira letra do nome. */
 export function Avatar({ nome, size = 52 }: { nome: string; size?: number }) {
-  const inicial = nome.trim().charAt(0).toLocaleUpperCase('pt-BR') || '?';
+  // Array.from separa por caractere real: um emoji no início não vira meio caractere quebrado.
+  const inicial = (Array.from(nome.trim())[0] ?? '?').toLocaleUpperCase('pt-BR');
   return (
     <View
       style={[styles.circulo, { width: size, height: size, borderRadius: size / 2 }]}

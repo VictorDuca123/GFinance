@@ -8,7 +8,8 @@ import { ArrowButton } from '../../src/components/ArrowButton';
 import { Badge } from '../../src/components/Badge';
 import { Button } from '../../src/components/Button';
 import { HeroHeader } from '../../src/components/HeroHeader';
-import { IconChevronLeft, IconPlus, IconSearch } from '../../src/components/icons';
+import { BackButton } from '../../src/components/BackButton';
+import { IconClose, IconPlus, IconSearch } from '../../src/components/icons';
 import { Avatar } from '../../src/components/NumberCircle';
 import { EstadoErro, EstadoVazio, Esqueleto } from '../../src/components/EstadosLista';
 import { colors, fonts, radius, shadow, touch } from '../../src/constants/theme';
@@ -42,6 +43,15 @@ export default function ClientesScreen() {
   // Sem busca e sem filtro, lista vazia quer dizer que ainda não há nenhum cliente cadastrado.
   const semFiltro = !termo.trim() && !somentePendentes;
   const novoCliente = () => iniciar('Adicionar cliente', { pathname: '/clientes/novo' });
+  const limparTudo = () => {
+    setBusca('');
+    setSomentePendentes(false);
+  };
+  // Sem resposta da API o total não mostra número (nem fica "carregando" para sempre).
+  const totalVisivel = data ? formatCurrency(data.totalGeralPendente) : error ? 'Indisponível' : '…';
+  const totalFalado = data
+    ? `Total pendente: ${formatCurrency(data.totalGeralPendente)}`
+    : error ? 'Total pendente indisponível no momento' : 'Carregando total pendente';
   const abrir = (c: Cliente) => router.push({ pathname: '/clientes/[id]', params: { id: String(c.id) } });
 
   return (
@@ -51,14 +61,7 @@ export default function ClientesScreen() {
 
       <View style={[styles.conteudo, { paddingHorizontal: margem, paddingTop: insets.top + 20 }]}>
         <View style={styles.linhaTitulo}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Voltar"
-            onPress={() => router.back()}
-            style={({ pressed }) => [styles.voltar, pressed && styles.pressionado]}
-          >
-            <IconChevronLeft size={28} color={colors.onDark} strokeWidth={2.8} />
-          </Pressable>
+          <BackButton />
           <Text style={styles.titulo} accessibilityRole="header">Clientes</Text>
         </View>
 
@@ -74,8 +77,20 @@ export default function ClientesScreen() {
               accessibilityLabel="Buscar cliente pelo nome"
               returnKeyType="search"
               autoCorrect={false}
+              maxLength={150}
               style={styles.campoBusca}
             />
+            {!!busca && (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Limpar busca"
+                onPress={() => setBusca('')}
+                hitSlop={8}
+                style={({ pressed }) => [styles.limpar, pressed && styles.pressionado]}
+              >
+                <IconClose size={22} color={colors.muted} strokeWidth={2.4} />
+              </Pressable>
+            )}
           </View>
           <Button
             label="Novo cliente"
@@ -89,14 +104,10 @@ export default function ClientesScreen() {
             <Filtro rotulo="Todos" ativo={!somentePendentes} onPress={() => setSomentePendentes(false)} />
             <Filtro rotulo="Só com valor pendente" ativo={somentePendentes} onPress={() => setSomentePendentes(true)} />
           </View>
-          <View
-            style={styles.total}
-            accessible
-            accessibilityLabel={data ? `Total pendente: ${formatCurrency(data.totalGeralPendente)}` : 'Carregando total pendente'}
-          >
+          <View style={styles.total} accessible accessibilityLabel={totalFalado}>
             <Text style={styles.rotuloTotal}>Total pendente</Text>
-            <View style={styles.capsulaTotal}>
-              <Text style={styles.valorTotal}>{data ? formatCurrency(data.totalGeralPendente) : '…'}</Text>
+            <View style={[styles.capsulaTotal, !data && !!error && styles.capsulaSemDado]}>
+              <Text style={[styles.valorTotal, !data && !!error && styles.valorSemDado]}>{totalVisivel}</Text>
             </View>
           </View>
         </View>
@@ -113,10 +124,19 @@ export default function ClientesScreen() {
                 texto="Cadastre o primeiro cliente para começar a registrar entradas."
                 acao={{ rotulo: 'Cadastrar cliente', onPress: novoCliente }}
               />
+            ) : termo.trim() ? (
+              <EstadoVazio
+                titulo="Nenhum cliente encontrado"
+                texto={somentePendentes
+                  ? 'Nenhum cliente com valor pendente tem esse nome. Confira o nome ou mostre todos.'
+                  : 'Confira o nome digitado na busca.'}
+                acao={{ rotulo: 'Limpar busca', onPress: limparTudo }}
+              />
             ) : (
               <EstadoVazio
-                titulo={somentePendentes ? 'Nenhum cliente com valor pendente' : 'Nenhum cliente encontrado'}
-                texto={somentePendentes ? 'Todos os clientes estão em dia.' : 'Confira o nome digitado na busca.'}
+                titulo="Nenhum cliente com valor pendente"
+                texto="Todos os clientes estão em dia."
+                acao={{ rotulo: 'Mostrar todos', onPress: limparTudo }}
               />
             )
           ) : (
@@ -125,6 +145,9 @@ export default function ClientesScreen() {
               keyExtractor={(c) => String(c.id)}
               contentContainerStyle={[styles.itens, { paddingBottom: 24 + insets.bottom }]}
               keyboardShouldPersistTaps="handled"
+              // Puxar para baixo atualiza; o mesmo indicador aparece enquanto a busca nova carrega.
+              refreshing={loading && !!data}
+              onRefresh={reload}
               renderItem={({ item }) => <LinhaCliente cliente={item} empilhar={estreita} onPress={() => abrir(item)} />}
             />
           )}
@@ -183,11 +206,6 @@ const styles = StyleSheet.create({
   pressionado: { opacity: 0.85 },
 
   linhaTitulo: { flexDirection: 'row', alignItems: 'center', gap: 16 },
-  voltar: {
-    width: touch, height: touch, borderRadius: touch / 2,
-    backgroundColor: colors.glassButton, borderWidth: 1, borderColor: colors.glassBorder,
-    alignItems: 'center', justifyContent: 'center',
-  },
   titulo: { fontFamily: fonts.heavy, fontSize: 32, color: colors.onDark },
 
   linhaBusca: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 16 },
@@ -198,6 +216,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface, ...shadow.card,
   },
   campoBusca: { flex: 1, minHeight: touch, fontFamily: fonts.semibold, fontSize: 18, color: colors.ink },
+  // 40 dp visíveis + 8 dp de folga em volta = 56 dp de área de toque.
+  limpar: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.bg },
 
   linhaFiltros: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 16 },
   filtros: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
@@ -210,6 +230,8 @@ const styles = StyleSheet.create({
   rotuloTotal: { fontFamily: fonts.semibold, fontSize: 17, color: colors.muted },
   capsulaTotal: { minHeight: 44, paddingHorizontal: 20, borderRadius: radius.pill, backgroundColor: colors.action, justifyContent: 'center' },
   valorTotal: { fontFamily: fonts.bold, fontSize: 21, color: colors.onDark, fontVariant: ['tabular-nums'] },
+  capsulaSemDado: { backgroundColor: colors.disabledBg },
+  valorSemDado: { color: colors.disabledText, fontSize: 17 },
 
   lista: { flex: 1 },
   itens: { gap: 12, paddingTop: 4 },

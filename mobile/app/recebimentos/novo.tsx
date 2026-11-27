@@ -1,7 +1,7 @@
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import { ComponentRef, useEffect, useRef, useState } from 'react';
 import {
-  AccessibilityInfo, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View,
+  AccessibilityInfo, KeyboardAvoidingView, ScrollView, StyleSheet, Text, useWindowDimensions, View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button } from '../../src/components/Button';
@@ -9,8 +9,9 @@ import { ClientePicker } from '../../src/components/ClientePicker';
 import { ErrorBanner } from '../../src/components/ErrorBanner';
 import { FormField } from '../../src/components/FormField';
 import { HeroHeader } from '../../src/components/HeroHeader';
-import { IconAlert, IconCheck, IconChevronLeft } from '../../src/components/icons';
-import { colors, fonts, radius, touch } from '../../src/constants/theme';
+import { BackButton, useVoltar } from '../../src/components/BackButton';
+import { IconAlert, IconCheck } from '../../src/components/icons';
+import { colors, fonts, radius } from '../../src/constants/theme';
 import { useResponsavelDaOperacao } from '../../src/hooks/useResponsavelDaOperacao';
 import { clientesApi, recebimentosApi } from '../../src/services/api';
 import { Cliente } from '../../src/types';
@@ -37,7 +38,7 @@ const arred = (n: number) => Math.round(n * 100) / 100;
 const MSG_VALOR = 'Informe o valor recebido.';
 
 export default function NovoRecebimentoScreen() {
-  const router = useRouter();
+  const voltar = useVoltar();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const estreita = width < 600;
@@ -111,25 +112,19 @@ export default function NovoRecebimentoScreen() {
   }
 
   return (
-    <View style={styles.tela}>
+    // KeyboardAvoidingView: no Android de ponta a ponta o teclado não encolhe a tela sozinho.
+    <KeyboardAvoidingView style={styles.tela} behavior="padding">
       <Stack.Screen options={{ headerShown: false, title: 'Registrar entrada' }} />
       <ScrollView ref={rolagem} contentContainerStyle={{ paddingBottom: 32 + insets.bottom }} keyboardShouldPersistTaps="handled">
         <HeroHeader height={170} />
         <View style={[styles.topo, { paddingTop: insets.top + 20, paddingHorizontal: estreita ? 24 : 48 }]}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Voltar"
-            onPress={() => router.back()}
-            style={({ pressed }) => [styles.voltar, pressed && styles.pressionado]}
-          >
-            <IconChevronLeft size={28} color={colors.onDark} strokeWidth={2.8} />
-          </Pressable>
+          <BackButton />
           <Text style={styles.titulo} accessibilityRole="header">Registrar entrada</Text>
         </View>
 
         <View style={[styles.cartao, estreita && styles.cartaoEstreito]}>
           {confirmacao ? (
-            <TelaConfirmacao c={confirmacao} onConcluir={() => router.back()} />
+            <TelaConfirmacao c={confirmacao} onConcluir={voltar} />
           ) : (
             <>
               <ClientePicker selecionado={cliente} onSelect={setCliente} erro={erros.cliente} />
@@ -145,6 +140,8 @@ export default function NovoRecebimentoScreen() {
                 onBlur={() => setValorTocado(true)}
                 placeholder="0,00"
                 keyboardType="decimal-pad"
+                // O banco guarda até 10 dígitos antes da vírgula (DECIMAL 12,2), com separadores.
+                maxLength={16}
                 error={erroValor}
               >
                 {cliente && pendente > 0 && (
@@ -195,7 +192,7 @@ export default function NovoRecebimentoScreen() {
 
               <View style={[styles.rodape, estreita && styles.rodapeEstreito]}>
                 <View style={!estreita && styles.cancelar}>
-                  <Button label="Cancelar" variant="ghost" onPress={() => router.back()} />
+                  <Button label="Cancelar" variant="ghost" onPress={voltar} />
                 </View>
                 <View style={!estreita && styles.salvar}>
                   <Button
@@ -212,7 +209,7 @@ export default function NovoRecebimentoScreen() {
           )}
         </View>
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -242,13 +239,7 @@ function TelaConfirmacao({ c, onConcluir }: { c: Confirmacao; onConcluir: () => 
 
 const styles = StyleSheet.create({
   tela: { flex: 1, backgroundColor: colors.bg },
-  pressionado: { opacity: 0.85 },
   topo: { flexDirection: 'row', alignItems: 'center', gap: 16, width: '100%', maxWidth: 1280, alignSelf: 'center' },
-  voltar: {
-    width: touch, height: touch, borderRadius: touch / 2,
-    backgroundColor: colors.glassButton, borderWidth: 1, borderColor: colors.glassBorder,
-    alignItems: 'center', justifyContent: 'center',
-  },
   titulo: { flex: 1, fontFamily: fonts.heavy, fontSize: 32, color: colors.onDark },
 
   // O cartão sobe sobre a faixa em degradê (sobreposição a partir de ~104 dp do topo).

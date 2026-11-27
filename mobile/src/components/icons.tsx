@@ -22,7 +22,8 @@ function Base({ size = 24, color, strokeWidth = 2.1, children }: IconProps & { c
 export const IconChevronRight = (p: IconProps) => <Base {...p}><Path d="M9 5l7 7-7 7" /></Base>;
 export const IconChevronLeft = (p: IconProps) => <Base {...p}><Path d="M15 5l-7 7 7 7" /></Base>;
 export const IconPlus = (p: IconProps) => <Base {...p}><Path d="M12 5v14M5 12h14" /></Base>;
-export const IconCheck = (p: IconProps) => <Base {...p}><Path d="M5 12.5l4.5 4.5L19 7.5" /></Base>;
+export const IconClose = (p: IconProps) => <Base {...p}><Path d="M6.5 6.5l11 11M17.5 6.5l-11 11" /></Base>;
+export const IconCheck =(p: IconProps) => <Base {...p}><Path d="M5 12.5l4.5 4.5L19 7.5" /></Base>;
 export const IconSearch = (p: IconProps) => (
   <Base {...p}><Circle cx={11} cy={11} r={6.5} /><Path d="M16 16l4 4" /></Base>
 );
