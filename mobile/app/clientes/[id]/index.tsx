@@ -40,10 +40,10 @@ export default function ClienteDetalheScreen() {
             </Card>
 
             <AppButton label="Editar cliente" variant="secondary" onPress={() => iniciar('Editar cliente', { pathname: '/clientes/[id]/editar', params: { id: String(clienteId) } })} />
-            <AppButton label="Registrar recebimento" onPress={() => iniciar('Registrar recebimento', { pathname: '/recebimentos/novo', params: { clienteId: String(clienteId) } })} />
-            <Subtitle>Recebimentos</Subtitle>
+            <AppButton label="Registrar entrada" onPress={() => iniciar('Registrar entrada', { pathname: '/recebimentos/novo', params: { clienteId: String(clienteId) } })} />
+            <Subtitle>Entradas</Subtitle>
             {data.recebimentos.length === 0 ? (
-              <Muted>Nenhum recebimento registrado para este cliente.</Muted>
+              <Muted>Nenhuma entrada registrada para este cliente.</Muted>
             ) : (
               data.recebimentos.map((r) => (
                 <Card key={r.id}>

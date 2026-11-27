@@ -10,7 +10,7 @@ import { historicoApi } from '../../src/services/api';
 import { formatDateTime } from '../../src/utils/format';
 
 const ACAO = { INCLUSAO: 'Inclusão', EDICAO: 'Edição' } as const;
-const TIPO = { CLIENTE: 'Cliente', FORNECEDOR: 'Fornecedor', RECEBIMENTO: 'Recebimento', SAIDA: 'Saída' } as const;
+const TIPO = { CLIENTE: 'Cliente', FORNECEDOR: 'Fornecedor', RECEBIMENTO: 'Entrada', SAIDA: 'Saída' } as const;
 
 export default function HistoricoScreen() {
   const { data, loading, error, reload } = useScreenData(() => historicoApi.listar(), []);
