@@ -34,6 +34,14 @@ export const colors = {
   warnBg: '#FFF4D6',
   skeleton: '#E6EAE3',
 
+  // Sobre o degradê: vidro escuro garante contraste mesmo quando o fundo chega no lima.
+  glass: 'rgba(11,11,11,0.55)',
+  glassBorder: 'rgba(255,255,255,0.35)',
+  onDark: '#FFFFFF',
+  onDarkMuted: 'rgba(255,255,255,0.92)',
+  glassLight: 'rgba(255,255,255,0.2)', // círculo de ícone sobre o degradê
+  textScrim: 'rgba(0,0,0,0.45)', // sombra que mantém texto branco legível sobre o verde
+
   // Nomes antigos, ainda usados pelas telas fora do novo visual (Fornecedores, Saídas,
   // Histórico, Relatórios). Apontam para a paleta nova para manter tudo coerente.
   secondary: '#FEF647',

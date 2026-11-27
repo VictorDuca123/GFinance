@@ -33,6 +33,10 @@ export function HeroHeader({ height, waveTop, children }: Props) {
         </Svg>
       </LinearGradient>
       {waveTop !== undefined && (
+        // Abaixo da onda o fundo volta a ser bg (o degradê só aparece acima dela).
+        <View style={[styles.abaixoDaOnda, { top: waveTop + 100 }]} />
+      )}
+      {waveTop !== undefined && (
         <Svg
           width="100%" height={111} viewBox="0 0 1280 111" preserveAspectRatio="none"
           style={[styles.onda, { top: waveTop }]} accessibilityElementsHidden importantForAccessibility="no-hide-descendants"
@@ -48,4 +52,5 @@ export function HeroHeader({ height, waveTop, children }: Props) {
 const styles = StyleSheet.create({
   faixa: { position: 'absolute', top: 0, left: 0, right: 0 },
   onda: { position: 'absolute', left: 0, right: 0 },
+  abaixoDaOnda: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: colors.bg },
 });
