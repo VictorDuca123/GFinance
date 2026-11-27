@@ -41,6 +41,6 @@ const styles = StyleSheet.create({
   danger: { backgroundColor: colors.danger },
   pressed: { opacity: 0.85 },
   disabled: { opacity: 0.5 },
-  label: { color: colors.primary, fontSize: fontSize.body, fontWeight: '700' },
+  label: { color: colors.text, fontSize: fontSize.body, fontWeight: '700' },
   labelSecondary: { color: colors.primary },
 });
